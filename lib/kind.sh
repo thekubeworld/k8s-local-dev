@@ -44,7 +44,6 @@ function kind_load_image() {
     #   Load image to kind                                           #
     ##################################################################
     container_image="${1}"
-    cluster_name="${cluster_name}"
 
     if "${KIND_CMD}" load docker-image "${container_image}" --name "${CILIUM_CLUSTER_NAME}" ; then
         echo "Image loaded: ${container_image}"
