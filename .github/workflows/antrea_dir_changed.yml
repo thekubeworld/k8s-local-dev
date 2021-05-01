@@ -1,0 +1,17 @@
+name: "Antrea: Dir Changed job"
+# If any file change in the antrea path a new build will be triggered
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - antrea/**
+
+jobs:
+  antrea-dir-changed-job:
+    runs-on: [ ubuntu-latest ]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run
+      working-directory: ./antrea
+      run: ./setup.sh

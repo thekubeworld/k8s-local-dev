@@ -1,0 +1,223 @@
+#!/usr/bin/env bash
+#
+# Copyright 2021 The Kubernetes Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# this utility prints out the golang install dir, even if go is not installed
+# IE it prints the directory where `go install ...` would theoretically place
+# binaries
+#
+source lib/config.sh
+source lib/common.sh
+
+SUPPORTED_CNI="\tantrea\n\tcalico\n\tcilium\n\tkindnetd\n\tflannel\n\tovn-kubernetes\n\tweavenet"
+function usage() {
+    echo "Usage: ${0} CNI_NAME"
+    echo
+    echo "Example:"
+    echo -e "\t${0} cni-foobar"
+    echo
+    echo -e "Supported CNI: \n${SUPPORTED_CNI}"
+    echo
+    echo "For more info use:"
+    echo -e "\t${0} --help"
+}
+
+function help_output() {
+    echo "Usage: ${0} CNI_NAME [OPTIONS]"
+    echo
+    echo "Supported Container Network Interface (CNI) names:" 
+    echo
+    supported_cni=(
+        "antrea"
+	"\tAntrea is a Kubernetes networking solution intended to be Kubernetes native. " \
+        "\tIt operates at Layer3/4 to provide networking and security services for a Kubernetes " \
+        "\tcluster, leveraging Open vSwitch as the networking data plane."
+        "\tSee also: https://github.com/vmware-tanzu/antrea" \
+
+	""
+	"calico"
+        "\tCalico is an open source networking and network security solution for containers, " \
+        "\tvirtual machines, and bare-metal workloads. Calico uses standard Linux networking " \
+        "\ttools to provide two major services for Cloud Native applications: " \
+        "\tNetwork connectivity between workloads. Network security policy enforcement " \
+        "\tbetween workloads."
+        "\tSee also: https://github.com/projectcalico/calico" \
+
+	""
+	"cilium"
+        "\tCilium is open source software for providing and transparently securing network " \
+        "\tconnectivity and loadbalancing between application workloads such as application " \
+        "\tcontainers or processes. Cilium operates at Layer 3/4 to provide traditional " \
+        "\tnetworking and security services as well as Layer 7 to protect and secure use " \
+        "\tof modern application protocols such as HTTP, gRPC and Kafka. A new Linux kernel " \
+        "\ttechnology called eBPF is at the foundation of Cilium."
+        "\tSee also: https://github.com/cilium/cilium" \
+
+	""
+	"flannel"
+        "\tFlannel runs a small, single binary agent called flanneld on each host, and is " \
+        "\tresponsible for allocating a subnet lease to each host out of a larger, " \
+        "\tpreconfigured address space. Flannel uses either the Kubernetes API or etcd " \
+        "\tdirectly to store the network configuration, the allocated subnets, and any " \
+        "\tauxiliary data (such as the host's public IP). Packets are forwarded using " \
+        "\tone of several backend mechanisms including VXLAN and various cloud integrations." \
+        "\tSee also: https://github.com/flannel-io/flannel" \
+        "\n\t\e[1m\e[31mNOTE\e[0m: Flannel DOES NOT SUPPORT Network Policy"
+
+
+	""
+	"ovn-kubernetes"
+        "\tOVN-Kubernetes is based on Open Virtual Network (OVN) and provides an " \
+        "\toverlay-based networking implementation. A cluster that uses the OVN-Kubernetes " \
+        "\tnetwork provider also runs Open vSwitch (OVS) on each node. OVN configures OVS on " \
+        "\teach node to implement the declared network configuration." \
+        "\tSee also: https://github.com/ovn-org/ovn-kubernetes"
+
+	""
+	"weavenet"
+        "\tWeave Net uses kernel’s Open vSwitch datapath module for pod-to-pod communication " \
+        "\twithout going to the userspace, which is known to be slow. It creates an " \
+        "\tOSI Layer 2 network and operates on kernel space." \
+        "\tOnly Linux is supported because of how Weave Net operates." \
+        "\tIt also supports Network Policies but creates extra DeamonSet to manage them." \
+        "\tFinally, Weave Net supports easily configurable out-of-box encryption at CNI " \
+        "\tlevel but this comes with a hefty network speed reduction."
+        "\tSee also: https://github.com/weaveworks/weave"
+
+	""
+	"kindnetd"
+	"\tKIND ships with a simple networking implementation kindnetd based around " \
+	"\tstandard CNI plugins (ptp, host-local, …) and simple netlink routes. " \
+        "\tThis CNI also handles IP masquerade. "
+    )
+
+    for cni in "${supported_cni[@]}"; do
+        echo -e "${cni}"
+    done
+
+echo -e "\nOPTIONS:"
+echo -e "\t--kube-proxy-mode\t\t Set the kube-proxy mode, default iptables"
+echo -e "\t\t\t\t Possible values: iptables|ipvs|none\n"
+
+}
+
+function main() {
+    # Check number of args
+    if [ ! $# -le 3 ]
+    then
+        usage
+        exit 1
+    fi
+
+    # Enable verbose
+    # shellcheck disable=SC2199
+    if [[ "$@" =~ "--verbose" || "$@" =~ "-v" ]]; then
+        set -eou pipefail
+        set -xv
+    fi
+
+    # If kube-proxy-mode is used as argument, get the value
+    # shellcheck disable=SC2199
+    if [[ "$@" =~ "--kube-proxy-mode" ]]; then
+        # shellcheck disable=SC2124
+        userinput="$@"
+        KUBE_PROXY_MODE="$(get_flag_value_stdin_argument "${userinput}"  "--kube-proxy-mode")"
+        if [ "${KUBE_PROXY_MODE}" != "iptables" ] && \
+           [ "${KUBE_PROXY_MODE}" != "ipvs" ] && \
+           [ "${KUBE_PROXY_MODE}" != "none" ]
+        then
+            echo "Exiting... kube-proxy supports only ${KUBE_PROXY_ALL_MODES} modes at moment"
+            exit 1
+        fi
+    fi
+
+    # parse options
+    for opt in "$@"; do
+        # make sure all in lower case
+        opt=$(echo "${opt}" | awk '{ print tolower($0); }')
+        case "${opt}" in
+        antrea)
+            echo "Starting antrea ${ANTREA_VERSION} setup..."
+            pushd ./antrea &> /dev/null || exit
+                ./setup.sh
+            popd &> /dev/null || exit
+            break
+            ;;
+
+        calico)
+            echo "Starting calico ${CALICO_VERSION} setup..."
+            pushd ./calico &> /dev/null || exit
+                ./setup.sh
+            popd &> /dev/null || exit
+            break
+            ;;
+
+        cilium)
+            echo "Starting cilium ${CILIUM_VERSION} setup..."
+            pushd ./cilium &> /dev/null || exit
+                ./setup.sh
+            popd &> /dev/null || exit
+            break
+            ;;
+
+        flannel)
+            echo "Starting flannel ${FLANNEL_VERSION} setup..."
+            pushd ./flannel &> /dev/null || exit
+                ./setup.sh
+            popd &> /dev/null || exit
+            break
+            ;;
+
+        ovn-kubernetes)
+            echo "Starting ovn-kubernetes ${OVN_KUBERNETES_VERSION} setup..."
+            pushd ./ovn-kubernetes &> /dev/null || exit
+                ./setup.sh
+            popd &> /dev/null || exit
+            break
+            ;;
+
+        weavenet)
+            echo "Starting weavenet ${WEAVENET_VERSION} setup..."
+            pushd ./weavenet &> /dev/null || exit
+                ./setup.sh
+            popd &> /dev/null || exit
+            break
+            ;;
+
+        kindnetd)
+            echo "Starting kindnetd setup..."
+            pushd ./kindnetd &> /dev/null || exit
+                if [ "${KUBE_PROXY_MODE}" != "iptables" ]
+                then
+                    replace_kubeproxy_option "${KUBE_PROXY_MODE}"
+                fi
+                ./setup.sh
+            popd &> /dev/null || exit
+            break
+            ;;
+
+        --help|-h)
+            help_output
+            ;;
+        *)
+            usage
+            exit 1
+            ;;
+       esac
+    done
+}
+
+main "$@"
+exit 0

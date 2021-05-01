@@ -1,0 +1,17 @@
+name: "Cilium Dir Changed Job"
+# If any file change in the Cilium path a new build will be triggered
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - cilium/**
+
+jobs:
+  cilium-dir-changed-job:
+    runs-on: [ ubuntu-latest ]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run
+      working-directory: ./cilium
+      run: ./setup.sh
