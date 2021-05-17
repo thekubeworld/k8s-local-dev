@@ -1,17 +1,44 @@
-name: "Flannel Changed Dir Job"
+name: "Flannel: Dir Changed job"
 # If any file change in the flannel path a new build will be triggered
 on:
   workflow_dispatch:
   push:
     branches: [ main ]
-    paths:
-      - flannel/**
+    #paths:
+    #- flannel/**
 
 jobs:
-  flannel-changed-dir-job:
-    runs-on: [ ubuntu-latest ]
+  #cleaner:
+  #  runs-on: self-hosted
+  #  steps:
+  #    - name: Runner workspace path
+  #      run: |
+  #        echo "Cleaning up previous run"
+  #        sudo rm -rf /home/runner/work/k8s-local-dev/
+  #        sudo rm -rf /home/runner/_work/k8s-local-dev/
+  flannel-dir-changed-job:
+    #needs: [cleaner]
+    runs-on: self-hosted #[ ubuntu-latest ]
+    env:
+      GOPATH: /home/runner/work/_temp/go
+      GO111MODULE: auto
     steps:
     - uses: actions/checkout@v2
+    # Setup Go
+    - name: Setup Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: '1.16.x'
     - name: Run
-      working-directory: ./flannel
-      run: ./setup.sh
+      #working-directory: ./flannel
+      run: |
+        sudo uname -a
+        GO111MODULE="on" go get sigs.k8s.io/kind@main
+        export PATH="$(go env GOPATH)/bin:${PATH}"
+        sudo apt update -y
+        sudo apt install patch -y
+        curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+        chmod 700 get_helm.sh
+        ./get_helm.sh
+        ./k8s-local-dev flannel
+        ./bin/kubectl get pods -A
