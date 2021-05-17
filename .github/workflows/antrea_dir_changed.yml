@@ -24,15 +24,18 @@ jobs:
     # Setup Go
     - name: Setup Go
       uses: actions/setup-go@v2
+      env:
+        GOPATH: $(go env GOPATH)
+        RUNNER_TEMP: /tmp
       with:
         go-version: '1.16.x'
-    - name: setup env
-      run: |
-        echo "::set-env name=GOPATH::$(go env GOPATH)"
-        echo "::add-path::$(go env GOPATH)/bin"
     - name: Run
       #working-directory: ./antrea
       run: |
+        echo "============"
+        echo $GOPATH
+        echo $GOROOT
+        echo "============"
         cd $RUNNER_TEMP
         GO111MODULE="on" go get sigs.k8s.io/kind@main
         export PATH="$(go env GOPATH)/bin:${PATH}"
