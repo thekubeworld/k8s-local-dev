@@ -1,17 +1,44 @@
-name: "Cilium Dir Changed Job"
-# If any file change in the Cilium path a new build will be triggered
+name: "Cilium: Dir Changed job"
+# If any file change in the cilium path a new build will be triggered
 on:
   workflow_dispatch:
   push:
     branches: [ main ]
     paths:
-      - cilium/**
+    - cilium/**
 
 jobs:
+  #cleaner:
+  #  runs-on: self-hosted
+  #  steps:
+  #    - name: Runner workspace path
+  #      run: |
+  #        echo "Cleaning up previous run"
+  #        sudo rm -rf /home/runner/work/k8s-local-dev/
+  #        sudo rm -rf /home/runner/_work/k8s-local-dev/
   cilium-dir-changed-job:
-    runs-on: [ ubuntu-latest ]
+    #needs: [cleaner]
+    runs-on: self-hosted #[ ubuntu-latest ]
+    env:
+      GOPATH: /home/runner/work/_temp/go
+      GO111MODULE: auto
     steps:
     - uses: actions/checkout@v2
+    # Setup Go
+    - name: Setup Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: '1.16.x'
     - name: Run
-      working-directory: ./cilium
-      run: ./setup.sh
+      #working-directory: ./cilium
+      run: |
+        sudo uname -a
+        GO111MODULE="on" go get sigs.k8s.io/kind@main
+        export PATH="$(go env GOPATH)/bin:${PATH}"
+        sudo apt update -y
+        sudo apt install patch -y
+        curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+        chmod 700 get_helm.sh
+        ./get_helm.sh
+        ./k8s-local-dev cilium
+        ./bin/kubectl get pods -A
