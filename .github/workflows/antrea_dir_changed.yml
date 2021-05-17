@@ -32,9 +32,6 @@ jobs:
     - name: Run
       #working-directory: ./antrea
       run: |
-        steps:
-    - name: Set env vars
-      run: |
         GO111MODULE="on" go get sigs.k8s.io/kind@main
         export PATH="$(go env GOPATH)/bin:${PATH}"
         sudo apt update -y
