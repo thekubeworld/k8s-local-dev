@@ -8,7 +8,7 @@ on:
     #- antrea/**
 
 jobs:
- cleaner:
+  cleaner:
     runs-on: self-hosted
     steps:
       - name: Runner workspace path
