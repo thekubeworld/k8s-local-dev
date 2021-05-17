@@ -74,8 +74,7 @@ function antrea_create_cluster() {
         if ./kind-setup.sh create "${ANTREA_CLUSTER_NAME}" --antrea-cni false; then
             echo "Cluster created"
         else
-            echo -e "[ \e[1m\e[31mFAIL\e[0m  ] cannot create kind cluster"
-            exit 1
+            echo -e "[ \e[1m\e[31mFAIL\e[0m  ] couldn't finish completely the kind deploy in the cluster"
         fi
     popd 1> /dev/null || exit
     echo "Deploying Antrea..."
