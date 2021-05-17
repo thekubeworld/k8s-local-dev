@@ -19,7 +19,7 @@ jobs:
   antrea-dir-changed-job:
     #needs: [cleaner]
     runs-on: self-hosted #[ ubuntu-latest ]
-      env:
+    env:
       GOPATH: $RUNNER_TEMP/go
       GO111MODULE: auto
     steps:
