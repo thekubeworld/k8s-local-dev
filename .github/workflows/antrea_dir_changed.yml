@@ -32,6 +32,7 @@ jobs:
     - name: Run
       #working-directory: ./antrea
       run: |
+        sudo uname -a
         sudo cat /etc/os-release
         sudo cat /etc/sysctl.conf
         sudo sysctl -w net.ipv4.tcp_retries2=15
