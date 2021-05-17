@@ -1,17 +1,44 @@
-name: "OVN Kubernetes Changed Dir Job"
+name: "OVN Kubernetes: Dir Changed job"
 # If any file change in the ovn-kubernetes path a new build will be triggered
 on:
   workflow_dispatch:
   push:
     branches: [ main ]
     paths:
-      - ovn-kubernetes/**
+    - ovn-kubernetes/**
 
 jobs:
-  ovn-kubernetes-changed-dir-job:
-    runs-on: [ ubuntu-latest ]
+  #cleaner:
+  #  runs-on: self-hosted
+  #  steps:
+  #    - name: Runner workspace path
+  #      run: |
+  #        echo "Cleaning up previous run"
+  #        sudo rm -rf /home/runner/work/k8s-local-dev/
+  #        sudo rm -rf /home/runner/_work/k8s-local-dev/
+  ovn-kubernetes-dir-changed-job:
+    #needs: [cleaner]
+    runs-on: self-hosted #[ ubuntu-latest ]
+    env:
+      GOPATH: /home/runner/work/_temp/go
+      GO111MODULE: auto
     steps:
     - uses: actions/checkout@v2
+    # Setup Go
+    - name: Setup Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: '1.16.x'
     - name: Run
-      working-directory: ./ovn-kubernetes
-      run: ./setup.sh
+      #working-directory: ./ovn-kubernetes
+      run: |
+        sudo uname -a
+        GO111MODULE="on" go get sigs.k8s.io/kind@main
+        export PATH="$(go env GOPATH)/bin:${PATH}"
+        sudo apt update -y
+        sudo apt install patch -y
+        curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+        chmod 700 get_helm.sh
+        ./get_helm.sh
+        ./k8s-local-dev ovn-kubernetes
+        ./bin/kubectl get pods -A
