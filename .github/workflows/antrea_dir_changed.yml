@@ -8,19 +8,20 @@ on:
     #- antrea/**
 
 jobs:
-  cleaner:
-    runs-on: self-hosted
-    steps:
-      - name: Runner workspace path
-        run: |
-          echo "Cleaning up previous run"
-          sudo rm -rf /home/runner/work/k8s-local-dev/
-          sudo rm -rf /home/runner/_work/k8s-local-dev/
+  #cleaner:
+  #  runs-on: self-hosted
+  #  steps:
+  #    - name: Runner workspace path
+  #      run: |
+  #        echo "Cleaning up previous run"
+  #        sudo rm -rf /home/runner/work/k8s-local-dev/
+  #        sudo rm -rf /home/runner/_work/k8s-local-dev/
   antrea-dir-changed-job:
-    needs: [cleaner]
+    #needs: [cleaner]
     runs-on: self-hosted #[ ubuntu-latest ]
-      #env:
-      #GO111MODULE: auto
+      env:
+      GOPATH: $RUNNER_TEMP/go
+      GO111MODULE: auto
     steps:
     - uses: actions/checkout@v2
     # Setup Go
@@ -31,6 +32,7 @@ jobs:
     - name: Run
       #working-directory: ./antrea
       run: |
+        cd $RUNNER_TEMP
         GO111MODULE="on" go get sigs.k8s.io/kind@main
         export PATH="$(go env GOPATH)/bin:${PATH}"
         sudo apt update -y
