@@ -75,6 +75,7 @@ function antrea_create_cluster() {
             echo "Cluster created"
         else
             echo -e "[ \e[1m\e[31mFAIL\e[0m  ] couldn't finish completely the kind deploy in the cluster"
+	    exit 1
         fi
     popd 1> /dev/null || exit
     echo "Deploying Antrea..."
