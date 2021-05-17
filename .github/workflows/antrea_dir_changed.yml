@@ -24,15 +24,15 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     # Setup Go
-    #- name: Setup Go
-    #  uses: actions/setup-go@v2
-    #  with:
-    #    go-version: '1.16.x'
+    - name: Setup Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: '1.16.x'
     - name: Run
       #working-directory: ./antrea
       run: |
-        #GO111MODULE="on" go get sigs.k8s.io/kind@main
-        #export PATH="$(go env GOPATH)/bin:${PATH}"
+        GO111MODULE="on" go get sigs.k8s.io/kind@main
+        export PATH="$(go env GOPATH)/bin:${PATH}"
         sudo apt update -y
         sudo apt install patch -y
         curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
