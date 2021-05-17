@@ -4,8 +4,8 @@ on:
   workflow_dispatch:
   push:
     branches: [ main ]
-    paths:
-      - antrea/**
+    #paths:
+    #- antrea/**
 
 jobs:
   antrea-dir-changed-job:
@@ -20,7 +20,7 @@ jobs:
       with:
         go-version: '1.16.x'
     - name: Run
-      working-directory: ./antrea
+      #working-directory: ./antrea
       run: |
         GO111MODULE="on" go get sigs.k8s.io/kind@main
         export PATH="$(go env GOPATH)/bin:${PATH}"
@@ -29,4 +29,5 @@ jobs:
         curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
         chmod 700 get_helm.sh
         ./get_helm.sh
-        ./setup.sh
+        #./setup.sh
+        ANTREA_VERSION=v0.12.0 ./k8s-local-dev
