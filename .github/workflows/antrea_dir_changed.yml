@@ -9,13 +9,13 @@ on:
 
 jobs:
  cleaner:
-   runs-on: self-hosted
-   steps:
-     - name: Runner workspace path
-       run: |
-         echo "Cleaning up previous run"
-         sudo rm -rf /home/runner/work/k8s-local-dev/
-         sudo rm -rf /home/runner/_work/k8s-local-dev/
+    runs-on: self-hosted
+    steps:
+      - name: Runner workspace path
+        run: |
+          echo "Cleaning up previous run"
+          sudo rm -rf /home/runner/work/k8s-local-dev/
+          sudo rm -rf /home/runner/_work/k8s-local-dev/
   antrea-dir-changed-job:
     needs: [cleaner]
     runs-on: self-hosted #[ ubuntu-latest ]
