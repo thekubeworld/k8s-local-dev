@@ -4,8 +4,8 @@ on:
   workflow_dispatch:
   push:
     branches: [ main ]
-    paths:
-    - cilium/**
+    #paths:
+    #- cilium/**
 
 jobs:
   #cleaner:
