@@ -10,11 +10,15 @@ on:
 jobs:
   antrea-dir-changed-job:
     runs-on: self-hosted #[ ubuntu-latest ]
+    env:
+      GO111MODULE: auto
     steps:
     - uses: actions/checkout@v2
     - name: Run
       working-directory: ./antrea
       run: |
+        GO111MODULE="on" go get sigs.k8s.io/kind@main
+        export PATH="$(go env GOPATH)/bin:${PATH}"
         sudo apt update -y
         sudo apt install patch -y
         curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
