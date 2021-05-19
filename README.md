@@ -38,7 +38,7 @@ For more info use:
 All **CNI** and **script configurations** are in a [single file](https://github.com/K8sbykeshed/k8s-local-dev/blob/main/lib/config.sh)  
 However, users can overwrite the default value in the file manually or using dynamic approach, example:
 ```
-$ ANTREA_VERSION=v0.12.0 ./k8s-local-dev antrea
+$ ANTREA_VERSION=v1.0.1 ./k8s-local-dev antrea
 ```
 The command above will **overwrite the default version** from [config.sh](https://github.com/K8sbykeshed/k8s-local-dev/blob/main/lib/config.sh) and set the local cluster with ANTREA 0.12.0
 Current variables used for deployment that users can overwrite:
