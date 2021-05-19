@@ -111,15 +111,13 @@ function download_kind() {
     #   Download kind tool                                           #
     ##################################################################
 
-    if [[ "${KIND_VERSION}" == "main" ]]; then
-        GO111MODULE="on" go get sigs.k8s.io/kind@main
-        export PATH="$(go env GOPATH)/bin:${PATH}"
-    else
-        echo "Downloading kind ${KIND_VERSION}..."
-        download_bin \
-            "${KIND_CMD}" \
-            "https://github.com/kubernetes-sigs/kind/releases/download/${KIND_VERSION}/kind-$(uname)-amd64"
-    fi
+    GO111MODULE="on" go get sigs.k8s.io/kind@main
+    export PATH="$(go env GOPATH)/bin:${PATH}"
+    #echo "Downloading kind ${KIND_VERSION}..."
+    #    download_bin \
+    #        "${KIND_CMD}" \
+    #        "https://github.com/kubernetes-sigs/kind/releases/download/${KIND_VERSION}/kind-$(uname)-amd64"
+    #fi
 }
 
 function download_kubectl() {
