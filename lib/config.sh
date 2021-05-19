@@ -152,7 +152,7 @@ export	FLANNEL_CLUSTER_NAME \
 ############### KIND/KUBECTL SETTINGS ##########################
 
 if [[ -z "${KIND_VERSION}" ]]; then
-    KIND_VERSION="v0.11.0"
+    KIND_VERSION="main"  # It can be v0.10.0 v0.11.0 etc
 fi
 KIND_CMD="${BIN_PATH}"/kind
 KIND_CONFIG_FILENAME="kindConfig.yaml"
