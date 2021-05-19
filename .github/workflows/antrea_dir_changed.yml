@@ -32,11 +32,6 @@ jobs:
     - name: Run
       #working-directory: ./antrea
       run: |
-        sudo uname -a
-        sudo cat /etc/os-release
-        sudo cat /etc/sysctl.conf
-        sudo sysctl -w net.ipv4.tcp_retries2=15
-        sudo sysctl -w net.ipv4.tcp_retries1=15
         GO111MODULE="on" go get sigs.k8s.io/kind@main
         export PATH="$(go env GOPATH)/bin:${PATH}"
         sudo apt update -y
