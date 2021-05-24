@@ -24,6 +24,8 @@
 DIR_LIBS="$(dirname "${BASH_SOURCE[0]}")"
 # shellcheck source=./config.sh
 source "${DIR_LIBS}/config.sh"
+# shellcheck source=./kind.sh
+source "${DIR_LIBS}/kind.sh"
 
 function cleanup_cluster() {
     ##################################################################
@@ -193,7 +195,12 @@ function replace_kubeproxy_option() {
    #   (in the current directory)                                   #
    ##################################################################
    mode="${1}"
-   sed -i "s/kubeProxyMode: \"iptables\"/kubeProxyMode: \"${mode}\"/g" "${KIND_CONFIG_FILENAME}"
+
+   if [[ "${mode}" == "userspace" ]]; then
+       kind_set_kubeproxy_in_userspace
+   else
+       sed -i "s/kubeProxyMode: \"iptables\"/kubeProxyMode: \"${mode}\"/g" "${KIND_CONFIG_FILENAME}"
+   fi
 }
 
 function get_flag_value_stdin_argument() {

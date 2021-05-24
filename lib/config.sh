@@ -26,8 +26,8 @@ fi
 
 HELM_CMD="helm"
 
-# Possible values: iptables, ipvs, none
-KUBE_PROXY_ALL_MODES="iptables, ipvs and none"
+# Possible values: iptables, ipvs, userspace, none
+KUBE_PROXY_ALL_MODES="iptables, ipvs, userspace and none"
 KUBE_PROXY_MODE="iptables"
 
 export CONTAINER_CMD_INTERFACE \

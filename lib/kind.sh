@@ -69,3 +69,23 @@ function kind_cleanup_cluster() {
         exit 1
     fi
 }
+
+function kind_set_kubeproxy_in_userspace() {
+    ##################################################################
+    # Description:                                                   #
+    #   set legacy userspace mode in kubeproxy via kubeadm config    #
+    ##################################################################
+    conf="${1}"
+
+    sed -i '/networking/d' "${KIND_CONFIG_FILENAME}"
+    sed -i '/kubeProxyMode:/d' "${KIND_CONFIG_FILENAME}"
+    sed -i '/podSubnet:/d' "${KIND_CONFIG_FILENAME}"
+    echo "kubeadmConfigPatches:
+- |
+  apiVersion: kubeproxy.config.k8s.io/v1alpha1
+  kind: KubeProxyConfiguration
+  metadata:
+    name: config
+  mode: \"userspace\"
+  " >> "${KIND_CONFIG_FILENAME}"
+}

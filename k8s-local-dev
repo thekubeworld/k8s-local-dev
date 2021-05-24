@@ -136,6 +136,7 @@ function main() {
         KUBE_PROXY_MODE="$(get_flag_value_stdin_argument "${userinput}"  "--kube-proxy-mode")"
         if [ "${KUBE_PROXY_MODE}" != "iptables" ] && \
            [ "${KUBE_PROXY_MODE}" != "ipvs" ] && \
+           [ "${KUBE_PROXY_MODE}" != "userspace" ] && \
            [ "${KUBE_PROXY_MODE}" != "none" ]
         then
             echo "Exiting... kube-proxy supports only ${KUBE_PROXY_ALL_MODES} modes at moment"
