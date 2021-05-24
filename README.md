@@ -16,8 +16,13 @@ Example 2 - Changing kube-proxy mode:
 ```
 $ ./k8s-local-dev kindnetd --kube-proxy-mode ipvs
 $ kubectl get configmap -n kube-system kube-proxy -o yaml | grep -i mode
-    detectLocalMode: ""
     mode: ipvs
+```
+
+```
+$ ./k8s-local-dev kindnetd --kube-proxy-mode userspace
+$ kubectl get configmap -n kube-system kube-proxy -o yaml | grep -i mode
+    mode: userspace
 ```
 
 Supported CNI: 
